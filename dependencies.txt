@@ -1,0 +1,24 @@
+# Core Dependencies
+flask
+flask-limiter
+flask-sqlalchemy
+psycopg2-binary
+
+# AI and Machine Learning
+langchain
+langchain-openai
+langchain-community
+faiss-cpu
+openai
+
+# PDF Processing
+PyPDF2
+
+# Utilities
+pydantic
+email-validator
+gunicorn
+twilio
+
+# Note: Install these packages using pip:
+# pip install -r dependencies.txt

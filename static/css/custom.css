@@ -1,0 +1,67 @@
+/* Minimal custom styles to complement Bootstrap */
+.card {
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background-color: var(--bs-dark);
+    border-top: 1px solid var(--bs-border-color);
+}
+
+.spinner-border {
+    margin-right: 8px;
+}
+
+#explanations {
+    border-top: 1px solid var(--bs-border-color);
+    padding-top: 20px;
+}
+
+textarea.form-control {
+    min-height: 120px;
+}
+
+main.container {
+    margin-bottom: 100px;
+}
+
+/* Group section styling */
+.group-section {
+    padding: 1rem;
+    background: var(--bs-dark);
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+}
+
+.group-section h4 {
+    color: var(--bs-light);
+    margin-bottom: 1rem;
+}
+
+/* Party card styling based on agreement level */
+.card.border-success {
+    border-left: 4px solid var(--bs-success);
+}
+
+.card.border-info {
+    border-left: 4px solid var(--bs-info);
+}
+
+.card.border-warning {
+    border-left: 4px solid var(--bs-warning);
+}
+
+.card.border-secondary {
+    border-left: 4px solid var(--bs-secondary);
+}
+
+.citation blockquote {
+    font-size: 0.9rem;
+    border-left: 3px solid var(--bs-primary);
+    padding-left: 1rem;
+    margin-left: 0;
+}
