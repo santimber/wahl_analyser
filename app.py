@@ -1,28 +1,23 @@
 import os
 import logging
+from dotenv import load_dotenv  # Load .env variables
 from flask import Flask, render_template, request, jsonify
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-from models import db, PoliticalStatement
 from rag_engine import analyze_statement
+
+# Load environment variables
+load_dotenv()
+
+# Ensure OpenAI API key and Pinecone API key are set
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
-app.secret_key = os.environ.get("SESSION_SECRET")
-
-# Database configuration
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///politics.db")
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
-    "pool_recycle": 300,
-    "pool_pre_ping": True,
-}
-
-# Initialize database
-db.init_app(app)
+app.secret_key = os.getenv("SESSION_SECRET")
 
 # Configure rate limiter
 limiter = Limiter(
@@ -31,10 +26,6 @@ limiter = Limiter(
     default_limits=["100 per day", "10 per minute"],
     storage_uri="memory://"
 )
-
-# Create database tables
-with app.app_context():
-    db.create_all()
 
 @app.route('/')
 def index():
@@ -52,6 +43,12 @@ def analyze():
         statement = data['statement']
         logger.info(f"Analyzing statement: {statement}")
 
+        # Get API Key securely
+        api_key = os.getenv("OPENAI_API_KEY")
+        if not api_key:
+            logger.error("Missing OPENAI_API_KEY")
+            return jsonify({'error': 'API key missing'}), 500
+
         # Analyze the statement using RAG
         analysis_result = analyze_statement(statement)
 
@@ -59,21 +56,8 @@ def analyze():
             logger.error("Analysis returned empty result")
             return jsonify({'error': 'Analysis failed to produce results'}), 500
 
-        # Store the statement and analysis in the database
-        try:
-            new_statement = PoliticalStatement(
-                statement=statement,
-                analysis_result=analysis_result
-            )
-            db.session.add(new_statement)
-            db.session.commit()
-            logger.info("Statement and analysis saved to database")
-        except Exception as db_error:
-            logger.error(f"Database error: {str(db_error)}")
-            # Continue even if database save fails
-            pass
-
         return jsonify(analysis_result)
+
     except ValueError as ve:
         logger.error(f"Validation error: {str(ve)}")
         return jsonify({'error': str(ve)}), 400

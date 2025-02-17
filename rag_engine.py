@@ -4,8 +4,15 @@ import logging
 from typing import List, Dict
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_community.vectorstores import FAISS
+from dotenv import load_dotenv
 from langchain.chains import RetrievalQA
 from langchain.prompts import PromptTemplate
+
+# Load environment variables
+load_dotenv()
+
+# Ensure OpenAI API key and Pinecone API key are set
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)

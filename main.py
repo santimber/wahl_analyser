@@ -1,5 +1,13 @@
 import logging
 from app import app
+import os
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
+
+# Ensure OpenAI API key and Pinecone API key are set
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
