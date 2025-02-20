@@ -113,7 +113,7 @@ logger.info("Initializing ChatOpenAI")
 llm = ChatOpenAI(temperature=0, model="gpt-4")
 
 # Define prompt template
-template = """Du bist ein Experte für politische Analyse. Analysiere die folgende politische Aussage und gib die Position jeder deutschen Partei zurück.
+template = """Reply in English when the user query is in English and German when it is in German. Du bist ein Experte für politische Analyse. Analysiere die folgende politische Aussage und gib die Position jeder deutschen Partei zurück.
 
 Kontext: {context}
 
