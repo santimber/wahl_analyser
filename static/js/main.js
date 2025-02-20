@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const form = document.getElementById('analysisForm');
     const analyzeBtn = document.getElementById('analyzeBtn');
     const spinner = analyzeBtn.querySelector('.spinner-border');
@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
-    form.addEventListener('submit', async function(e) {
+    form.addEventListener('submit', async function (e) {
         e.preventDefault();
         analyzeBtn.disabled = true;
         spinner.classList.remove('d-none');
@@ -92,7 +92,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const usedParties = new Set();
 
         groups.forEach(group => {
-            const groupParties = sortedParties.filter(party => 
+            const groupParties = sortedParties.filter(party =>
                 !usedParties.has(party.party) && group.filter(party)
             );
 
@@ -111,8 +111,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         <div class="collapse" id="citations-${partyInfo.party}">
                             <div class="mt-3 citations">
                                 <h6 class="mb-2">${textMappings[language].source} & Zitate:</h6>
-                                ${partyInfo.citations && partyInfo.citations.length > 0 
-                                    ? partyInfo.citations.map(citation => `
+                                ${partyInfo.citations && partyInfo.citations.length > 0
+                            ? partyInfo.citations.map(citation => `
                                         <div class="citation mb-2">
                                             <blockquote class="blockquote mb-1">
                                                 <p class="mb-0">${citation.text}</p>
@@ -122,8 +122,8 @@ document.addEventListener('DOMContentLoaded', function() {
                                             </footer>
                                         </div>
                                     `).join('')
-                                    : `<p class="text-muted">${textMappings[language].noCitations}</p>`
-                                }
+                            : `<p class="text-muted">${textMappings[language].noCitations}</p>`
+                        }
                             </div>
                         </div>
                     `;
@@ -135,7 +135,19 @@ document.addEventListener('DOMContentLoaded', function() {
                         agreement: partyInfo.agreement,
                         explanation: partyInfo.explanation.replace(/"/g, '&quot;')
                     };
-
+                    const socialMediaButtons = `
+                        <div class="btn-group mt-2" role="group" aria-label="Social Media Sharing">
+                            <button class="btn btn-outline-primary btn-sm" title="Share on Twitter" onclick='sharePartyAnalysis("twitter", ${JSON.stringify(shareData)})'>
+                                <i class="fab fa-twitter"></i> 
+                            </button>
+                            <button class="btn btn-outline-primary btn-sm" title="Share on Facebook" onclick='sharePartyAnalysis("facebook", ${JSON.stringify(shareData)})'>
+                                <i class="fab fa-facebook"></i> 
+                            </button>
+                            <button class="btn btn-outline-primary btn-sm" title="Share on LinkedIn" onclick='sharePartyAnalysis("linkedin", ${JSON.stringify(shareData)})'>
+                                <i class="fab fa-linkedin"></i> 
+                            </button>
+                        </div>
+                    `;
                     partyDiv.innerHTML = `
                         <div class="card-body">
                             <h5 class="mb-0">${getPartyFullName(partyInfo.party)}</h5>
@@ -144,19 +156,9 @@ document.addEventListener('DOMContentLoaded', function() {
                             <button class="btn btn-link" type="button" data-bs-toggle="collapse" data-bs-target="#citations-${partyInfo.party}">
                                 <i class="fas fa-quote-left me-1"></i>${textMappings[language].showSources}
                             </button>
-                            <div class="btn-group mt-2">
-                                <button class="btn btn-outline-primary btn-sm" title="Share on Twitter" onclick='sharePartyAnalysis("twitter", ${JSON.stringify(shareData)})'>
-                                    <i class="fab fa-twitter"></i> ${textMappings[language].share}
-                                </button>
-                                <button class="btn btn-outline-primary btn-sm" title="Share on Facebook" onclick='sharePartyAnalysis("facebook", ${JSON.stringify(shareData)})'>
-                                    <i class="fab fa-facebook"></i> ${textMappings[language].share}
-                                </button>
-                                <button class="btn btn-outline-primary btn-sm" title="Share on LinkedIn" onclick='sharePartyAnalysis("linkedin", ${JSON.stringify(shareData)})'>
-                                    <i class="fab fa-linkedin"></i> ${textMappings[language].share}
-                                </button>
-                            </div>
+                            ${socialMediaButtons} <!-- Now it's injected here -->
+                            ${citationsHtml}
                         </div>
-                        ${citationsHtml}
                     `;
 
                     groupDiv.appendChild(partyDiv);
@@ -182,4 +184,34 @@ document.addEventListener('DOMContentLoaded', function() {
         };
         return partyNames[partyKey] || partyKey;
     }
+    // Social Media Sharing Function - Fixed and Optimized
+    function sharePartyAnalysis(platform, data) {
+        const text = encodeURIComponent(`"${data.statement}"\n\n${data.party}: ${data.agreement}% Match\n${data.explanation}`);
+        const url = encodeURIComponent(window.location.href);
+
+        let shareUrl;
+        switch (platform) {
+            case 'twitter':
+                shareUrl = `https://twitter.com/intent/tweet?text=${text}&url=${url}`;
+                break;
+            case 'facebook':
+                shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${text}`;
+                break;
+            case 'linkedin':
+                shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${url}&summary=${text}`;
+                break;
+            default:
+                console.error('Unknown platform:', platform);
+                return;
+        }
+
+        // Open in a new tab and focus
+        const popup = window.open(shareUrl, '_blank', 'width=600,height=400');
+        if (popup) {
+            popup.focus();
+        } else {
+            alert('Please allow popups for this site.');
+        }
+    }
+
 });
