@@ -113,25 +113,43 @@ logger.info("Initializing ChatOpenAI")
 llm = ChatOpenAI(temperature=0, model="gpt-4")
 
 # Define prompt template
-template = """Reply in English when the user query is in English and German when it is in German. Du bist ein Experte für politische Analyse. Analysiere die folgende politische Aussage und gib die Position jeder deutschen Partei zurück.
+template = """
+First, detect the language of the user's query.
+- If the query is in English, respond in English.
+- If the query is in German, respond in German.
+- Do not switch languages.
+- Use the same language consistently for all parts of the JSON response.
 
-Kontext: {context}
+IMPORTANT:
+- The context is in German.
+- If the query is in English, TRANSLATE the context to English before analysis.
+- If the query is in German, use the context as is without translation.
 
-Aussage: {question}
+You are an expert in political analysis. Analyze the following political statement and provide the stance of each German political party.
 
-Antworte NUR mit einem JSON-Objekt in diesem Format:
+Context: {context}
+
+Statement: {question}
+
+Reply ONLY with a JSON object in this format:
 {{
-  "afd": {{"agreement": 75, "explanation": "Erklärung", "citations": []}},
-  "bsw": {{"agreement": 50, "explanation": "Erklärung", "citations": []}},
-  "cdu_csu": {{"agreement": 30, "explanation": "Erklärung", "citations": []}},
-  "linke": {{"agreement": 20, "explanation": "Erklärung", "citations": []}},
-  "fdp": {{"agreement": 60, "explanation": "Erklärung", "citations": []}},
-  "gruene": {{"agreement": 40, "explanation": "Erklärung", "citations": []}},
-  "spd": {{"agreement": 80, "explanation": "Erklärung", "citations": []}}
+  "afd": {{"agreement": 75, "explanation": "Explanation", "citations": []}},
+  "bsw": {{"agreement": 50, "explanation": "Explanation", "citations": []}},
+  "cdu_csu": {{"agreement": 30, "explanation": "Explanation", "citations": []}},
+  "linke": {{"agreement": 20, "explanation": "Explanation", "citations": []}},
+  "fdp": {{"agreement": 60, "explanation": "Explanation", "citations": []}},
+  "gruene": {{"agreement": 40, "explanation": "Explanation", "citations": []}},
+  "spd": {{"agreement": 80, "explanation": "Explanation", "citations": []}}
 }}
 
-WICHTIG: Formatiere die Antwort als valides JSON ohne zusätzlichen Text oder Zeichen. 
-und wenn jemand auf Englisch schreibt, antworte auf Englisch, alles sollte auf Englisch sein. Reply in English if text is in English"""
+STRICT REQUIREMENTS:
+- The response MUST be in valid JSON format.
+- No text or explanations outside the JSON object.
+- If the query is in English, explanations must be in English.
+- If the query is in German, explanations must be in German.
+- DO NOT provide any introductory or closing text.
+- If unable to provide a valid JSON response, state "Invalid JSON Format".
+"""
 
 PROMPT = PromptTemplate(template=template, input_variables=["context", "question"])
 
