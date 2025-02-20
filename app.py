@@ -1,10 +1,16 @@
 import os
 import logging
 from dotenv import load_dotenv  # Load .env variables
-from flask import Flask, render_template, request, jsonify, redirect, url_for, session
+from flask import Flask, render_template, request, jsonify, redirect, url_for, session, send_from_directory
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-from rag_engine import analyze_statement
+analyze_statement = None  # Temporary assignment to avoid circular import
+
+def import_analyze_statement():
+    global analyze_statement
+    from rag_engine import analyze_statement
+
+import_analyze_statement()
 
 # Load environment variables
 load_dotenv()
@@ -73,6 +79,11 @@ def analyze():
     except Exception as e:
         logger.error(f"Error analyzing statement: {str(e)}")
         return jsonify({'error': 'Analysis failed', 'details': str(e)}), 500
+
+# Serve static files from attached_assets
+@app.route('/static/documents/<path:filename>')
+def serve_pdf(filename):
+    return send_from_directory('attached_assets', filename)
 
 @app.errorhandler(429)
 def ratelimit_handler(e):

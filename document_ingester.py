@@ -114,37 +114,37 @@ if __name__ == "__main__":
     # Define the documents to process with official German party names
     documents = [
         {
-            "file_path": "attached_assets/AFD.pdf",
+            "file_path": "/static/documents/AFD.pdf",
             "party": "Alternative für Deutschland",
             "category": "platform"
         },
         {
-            "file_path": "attached_assets/BSW.pdf",
+            "file_path": "/static/documents/BSW.pdf",
             "party": "Bündnis Sahra Wagenknecht",
             "category": "platform"
         },
         {
-            "file_path": "attached_assets/CDU_CSU.pdf",
+            "file_path": "/static/documents/CDU_CSU.pdf",
             "party": "CDU/CSU",
             "category": "platform"
         },
         {
-            "file_path": "attached_assets/Die Linke.pdf",
+            "file_path": "/static/documents/Die Linke.pdf",
             "party": "DIE LINKE",
             "category": "platform"
         },
         {
-            "file_path": "attached_assets/FDP.pdf",
+            "file_path": "/static/documents/FDP.pdf",
             "party": "Freie Demokratische Partei",
             "category": "platform"
         },
         {
-            "file_path": "attached_assets/Gruen.pdf",
+            "file_path": "/static/documents/Gruen.pdf",
             "party": "BÜNDNIS 90/DIE GRÜNEN",
             "category": "platform"
         },
         {
-            "file_path": "attached_assets/SPD.pdf",
+            "file_path": "/static/documents/SPD.pdf",
             "party": "Sozialdemokratische Partei Deutschlands",
             "category": "platform"
         }

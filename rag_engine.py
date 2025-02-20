@@ -1,80 +1,17 @@
 import os
 import json
 import logging
-from typing import List, Dict
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_community.vectorstores import FAISS
 from dotenv import load_dotenv
-from langchain.chains import RetrievalQA
 from langchain.prompts import PromptTemplate
+from langchain.chains import RetrievalQA
 
 # Load environment variables
 load_dotenv()
 
-# Ensure OpenAI API key and Pinecone API key are set
+# Ensure OpenAI API key is set
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-
-# Configure logging
-logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger(__name__)
-
-def extract_citations_from_pdfs(source_docs):
-    """
-    Extract exact quotations with page numbers from retrieved PDFs.
-    """
-    citations_by_party = {party: [] for party in ["afd", "bsw", "cdu_csu", "linke", "fdp", "gruene", "spd"]}
-
-    for doc in source_docs:
-        if hasattr(doc, "metadata"):
-            party_key = normalize_party_name(doc.metadata.get("party", ""))
-            if party_key in citations_by_party:
-                # Extract text and clean it
-                raw_text = doc.page_content.strip()
-
-                # Remove page markers and clean up text
-                text_parts = raw_text.split(']')
-                extracted_text = text_parts[-1] if len(text_parts) > 1 else raw_text
-                extracted_text = extracted_text.strip().replace("\n", " ")
-
-                # Ensure complete sentences by finding sentence boundaries
-                sentences = []
-                current_sentence = ""
-                words = extracted_text.split()
-
-                for word in words:
-                    current_sentence += word + " "
-                    if word.strip().endswith(('.', '!', '?')):
-                        sentences.append(current_sentence.strip())
-                        current_sentence = ""
-
-                if current_sentence.strip():  # Add any remaining text if it seems complete
-                    if len(current_sentence.split()) > 5:  # Only add if it's a substantial fragment
-                        sentences.append(current_sentence.strip())
-
-                # Join complete sentences up to roughly 500 characters
-                final_text = ""
-                for sentence in sentences:
-                    if len(final_text) + len(sentence) + 1 <= 500:
-                        final_text += sentence + " "
-                    else:
-                        break
-
-                final_text = final_text.strip()
-
-                if final_text:  # Only add if we have valid text
-                    # Retrieve correct page number
-                    page_number = doc.metadata.get("page", "Unknown")
-                    if isinstance(page_number, (list, tuple)):
-                        page_number = page_number[0] if page_number else "Unknown"
-
-                    # Store citation with page number and source file
-                    citations_by_party[party_key].append({
-                        "text": final_text,
-                        "source": doc.metadata.get("source", "Unknown"),
-                        "page": page_number
-                    })
-
-    return citations_by_party
 
 def normalize_party_name(party: str) -> str:
     """
@@ -92,12 +29,26 @@ def normalize_party_name(party: str) -> str:
     normalized = party.lower().replace(" ", "_").replace("/", "_")
     return mapping.get(normalized, normalized)
 
-# Initialize embeddings and vector store
+# Configure logging
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+
+# ✅ Direct Links to Official Wahlprograms
+WAHLPROGRAM_URLS = {
+    "cdu_csu": "https://www.cdu.de/app/uploads/2025/01/km_btw_2025_wahlprogramm_langfassung_ansicht.pdf",
+    "spd": "https://www.spd.de/fileadmin/Dokumente/Beschluesse/Programm/SPD_Programm_bf.pdf",
+    "fdp": "https://www.fdp.de/sites/default/files/2024-12/fdp-wahlprogramm_2025.pdf",
+    "gruene": "https://cms.gruene.de/uploads/assets/Regierungsprogramm_DIGITAL_DINA5.pdf",
+    "linke": "https://www.die-linke.de/fileadmin/user_upload/Wahlprogramm_Langfassung_Linke-BTW25_01.pdf",
+    "afd": "https://www.afd.de/wp-content/uploads/2025/02/AfD_Bundestagswahlprogramm2025_web.pdf",
+    "bsw": "https://bsw-vg.de/wp-content/themes/bsw/assets/downloads/BSW%20Wahlprogramm%202025.pdf"
+}
+
+# ✅ Embeddings and Vector Store Initialization
 try:
     logger.info("Initializing OpenAI embeddings")
     embeddings = OpenAIEmbeddings()
 
-    # Load the FAISS index
     logger.info("Loading FAISS index")
     vectorstore = FAISS.load_local(
         "faiss_index",
@@ -105,14 +56,16 @@ try:
         allow_dangerous_deserialization=True
     )
 except Exception as e:
-    logger.error(f"Failed to initialize vector store: {str(e)}", exc_info=True)
+    logger.error(
+        f"Failed to initialize vector store: {str(e)}", exc_info=True
+    )
     raise
 
-# Initialize the language model
+# ✅ Language Model Initialization
 logger.info("Initializing ChatOpenAI")
 llm = ChatOpenAI(temperature=0, model="gpt-4")
 
-# Define prompt template
+# ✅ Prompt Template
 template = """
 First, detect the language of the user's query.
 - If the query is in English, respond in English.
@@ -125,7 +78,8 @@ IMPORTANT:
 - If the query is in English, TRANSLATE the context to English before analysis.
 - If the query is in German, use the context as is without translation.
 
-You are an expert in political analysis. Analyze the following political statement and provide the stance of each German political party.
+You are an expert in political analysis. Analyze the following political 
+statement and provide the stance of each German political party.
 
 Context: {context}
 
@@ -151,72 +105,112 @@ STRICT REQUIREMENTS:
 - If unable to provide a valid JSON response, state "Invalid JSON Format".
 """
 
-PROMPT = PromptTemplate(template=template, input_variables=["context", "question"])
+PROMPT = PromptTemplate(
+    template=template,
+    input_variables=["context", "question"]
+)
 
-# Create the QA chain with increased retrieval
+# ✅ QA Chain Initialization (Before analyze_statement)
 logger.info("Creating QA chain")
 qa_chain = RetrievalQA.from_chain_type(
     llm=llm,
     chain_type="stuff",
-    retriever=vectorstore.as_retriever(search_kwargs={"k": 15}),  # Increased retrieval
+    retriever=vectorstore.as_retriever(search_kwargs={"k": 15}),
     chain_type_kwargs={
         "prompt": PROMPT,
         "verbose": True
     },
-    return_source_documents=True  # Ensure source documents are returned
+    return_source_documents=True
 )
+
+
+def extract_citations(source_docs):
+    """
+    Extract and format quotations with direct links to Wahlprograms.
+    - Limits to a maximum of 3 citations per party.
+    - Ensures complete sentences.
+    """
+    citations_by_party = {
+        party: [] for party in [
+            "afd", "bsw", "cdu_csu", "linke", "fdp", "gruene", "spd"
+        ]
+    }
+
+    for doc in source_docs:
+        if hasattr(doc, "metadata"):
+            party_key = normalize_party_name(
+                doc.metadata.get("party", "")
+            )
+            if party_key in citations_by_party:
+                raw_text = doc.page_content.strip()
+                text_parts = raw_text.split(']')
+                extracted_text = (
+                    text_parts[-1] if len(text_parts) > 1 else raw_text
+                )
+                extracted_text = extracted_text.strip().replace("\n", " ")
+
+                sentences = extracted_text.split('. ')
+                citations = []
+
+                for sentence in sentences[:3]:  # Max 3 citations per party
+                    final_text = sentence.strip()
+
+                    # Direct link to official Wahlprogram
+                    wahlprogram_link = WAHLPROGRAM_URLS.get(
+                        party_key, "#"
+                    )
+
+                    # Get page number if available
+                    page_number = doc.metadata.get("page", "Unbekannt")
+
+                    # Construct citation with link and page number
+                    citations.append({
+                        "text": final_text,
+                        "source": "Wahlprogram",
+                        "wahlprogram_link": wahlprogram_link,
+                        "page": page_number
+                    })
+
+                if citations:
+                    citations_by_party[party_key] = citations
+
+    return citations_by_party
 
 def analyze_statement(statement: str) -> dict:
     """
-    Analyze a political statement using the RAG system, ensuring citations include exact quotations and page numbers.
+    Analyze a political statement using the RAG system.
     """
     try:
         logger.info(f"Starting analysis of statement: {statement}")
 
-        # Get response from the chain
         result = qa_chain({"query": statement})
         logger.debug(f"Raw chain result: {result}")
 
-        # Extract relevant citations from PDF source documents
         source_docs = result.get("source_documents", [])
-        citations_by_party = extract_citations_from_pdfs(source_docs)
+        citations_by_party = extract_citations(source_docs)
 
-        # Extract the answer
         answer = result.get("result", "").strip()
         if not answer:
             logger.warning("Empty response received from model.")
             return {}
 
-        try:
-            parsed_result = json.loads(answer)
-            logger.debug(f"Parsed result: {parsed_result}")
+        parsed_result = json.loads(answer)
+        required_parties = ["afd", "bsw", "cdu_csu", "linke", "fdp", "gruene", "spd"]
+        result_dict = {}
 
-            # Validate structure and attach citations
-            required_parties = ["afd", "bsw", "cdu_csu", "linke", "fdp", "gruene", "spd"]
-            result_dict = {}
+        for party in required_parties:
+            party_data = parsed_result.get(party, {})
+            if not isinstance(party_data, dict):
+                party_data = {}
 
-            for party in required_parties:
-                party_data = parsed_result.get(party, {})
-                if not isinstance(party_data, dict):
-                    party_data = {}
+            party_data["citations"] = citations_by_party.get(party, [])
+            result_dict[party] = {
+                "agreement": min(100, max(0, int(party_data.get("agreement", 0)))),
+                "explanation": str(party_data.get("explanation", "Keine Erklärung verfügbar.")),
+                "citations": party_data["citations"]
+            }
 
-                # Attach citations from PDF documents
-                party_data["citations"] = citations_by_party.get(party, [])
-
-                # Clean and validate party data
-                result_dict[party] = {
-                    "agreement": min(100, max(0, int(party_data.get("agreement", 0)))),
-                    "explanation": str(party_data.get("explanation", "Keine Erklärung verfügbar.")),
-                    "citations": party_data["citations"]
-                }
-
-            logger.info("Successfully generated analysis result with citations from PDFs")
-            return result_dict
-
-        except json.JSONDecodeError as e:
-            logger.error(f"JSON parsing error: {str(e)}", exc_info=True)
-            logger.error(f"Raw response that failed to parse: {answer}")
-            raise ValueError("Ungültiges Antwortformat vom Analysedienst")
+        return result_dict
 
     except Exception as e:
         logger.error(f"Analysis failed: {str(e)}", exc_info=True)
