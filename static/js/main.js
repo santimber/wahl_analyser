@@ -184,34 +184,35 @@ document.addEventListener('DOMContentLoaded', function () {
         };
         return partyNames[partyKey] || partyKey;
     }
-    // Social Media Sharing Function - Fixed and Optimized
-    function sharePartyAnalysis(platform, data) {
-        const text = encodeURIComponent(`"${data.statement}"\n\n${data.party}: ${data.agreement}% Match\n${data.explanation}`);
-        const url = encodeURIComponent(window.location.href);
-
-        let shareUrl;
-        switch (platform) {
-            case 'twitter':
-                shareUrl = `https://twitter.com/intent/tweet?text=${text}&url=${url}`;
-                break;
-            case 'facebook':
-                shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${text}`;
-                break;
-            case 'linkedin':
-                shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${url}&summary=${text}`;
-                break;
-            default:
-                console.error('Unknown platform:', platform);
-                return;
-        }
-
-        // Open in a new tab and focus
-        const popup = window.open(shareUrl, '_blank', 'width=600,height=400');
-        if (popup) {
-            popup.focus();
-        } else {
-            alert('Please allow popups for this site.');
-        }
-    }
 
 });
+
+// Social Media Sharing Function - Fixed and Optimized for All Platforms
+function sharePartyAnalysis(platform, data) {
+    const text = encodeURIComponent(`"${data.statement}"\n\n${data.party}: ${data.agreement}% Match\n${data.explanation}`);
+    const url = window.location.href;
+
+    let shareUrl;
+    switch (platform) {
+        case 'twitter':
+            shareUrl = `https://twitter.com/intent/tweet?text=${text}&url=${encodeURIComponent(url)}`;
+            break;
+        case 'facebook':
+            shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+            break;
+        case 'linkedin':
+            shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
+            break;
+        default:
+            console.error('Unknown platform:', platform);
+            return;
+    }
+
+    // Open in a new tab and focus
+    const popup = window.open(shareUrl, '_blank', 'width=600,height=400');
+    if (popup) {
+        popup.focus();
+    } else {
+        alert('Please allow popups for this site.');
+    }
+}
