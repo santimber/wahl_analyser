@@ -37,5 +37,9 @@
 {% endblock %}
 
 {% block scripts %}
+<!-- Pass the selected language to JavaScript for dynamic switching -->
+<script>
+    document.documentElement.lang = "{{ language }}";
+</script>
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 {% endblock %}

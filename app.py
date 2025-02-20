@@ -33,9 +33,11 @@ def set_language():
     session['language'] = request.form['language']
     return redirect(request.referrer)
 
+# Updated Index Route for Dynamic Language Switching
 @app.route('/')
 def index():
-    language = session.get('language', 'en')
+    # Get the language from the session, default to 'de' (German)
+    language = session.get('language', 'de')
     return render_template('index.html', language=language)
 
 @app.route('/analyze', methods=['POST'])
