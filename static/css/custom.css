@@ -60,25 +60,32 @@ main.container {
 }
 
 .citation {
-    padding: 0.5rem 1rem;
-    border-left: 4px solid var(--bs-primary);
-    margin-bottom: 1rem;
-    background-color: #f9f9f9;
-    border-radius: 5px;
+    padding: 10px;
+    background-color: transparent;
+    border-left: none;
+    border-radius: 4px;
+    box-shadow: none;
+    margin-bottom: 15px;
 }
 
-.citation blockquote {
-    font-size: 0.9rem;
-    margin: 0;
-    color: #555;
+.citation p {
+    margin-bottom: 0.3em; /* Reduced spacing below the quote */
+    font-style: italic;
+    color: #adb5bd;
+    font-size: 0.85em;
 }
 
 .citation .blockquote-footer {
-    font-size: 0.8rem;
-    color: #777;
+    color: #6c757d;
+    font-size: 0.7em;
+    margin-top: 4px; /* Slightly lowered the source text */
 }
 
-.citation a.text-decoration-none {
-    color: var(--bs-primary);
+.citation a {
+    color: #007bff;
     text-decoration: none;
+}
+
+.citation a:hover {
+    text-decoration: underline;
 }

@@ -114,16 +114,19 @@ document.addEventListener('DOMContentLoaded', function () {
                                 ${partyInfo.citations && partyInfo.citations.length > 0
                                     ? partyInfo.citations.slice(0, 3).map(citation => `
                                         <div class="citation mb-3">
-                                            <blockquote class="blockquote mb-1">
-                                                <p class="mb-0">${citation.text}</p>
+                                            <blockquote class="blockquote p-2 mb-3 rounded citation" style="background-color: transparent; border-left: none;">
+                                                <p class="mb-1" style="font-size: 0.85em; line-height: 1.3; font-style: italic; color: #adb5bd;">
+                                                    ${citation.text}
+                                                </p>
+                                                <footer class="blockquote-footer text-end" style="font-size: 0.7em; color: #6c757d; margin-top: 4px;">
+                                                    ${textMappings[language].source}: 
+                                                    <a href="${citation.wahlprogram_link}" target="_blank" style="text-decoration: underline;">
+                                                        ${citation.source}
+                                                    </a>
+                                                    ${citation.page ? `, Seite ${citation.page}` : ''}
+                                                </footer>
                                             </blockquote>
-                                            <footer class="blockquote-footer">
-                                                ${textMappings[language].source}: 
-                                                <a href="${citation.wahlprogram_link}" target="_blank">
-                                                    ${citation.source}
-                                                </a>
-                                                ${citation.page ? `, Seite ${citation.page}` : ''}
-                                            </footer>
+                                    
                                         </div>
                                     `).join('')
                                     : `<p class="text-muted">${textMappings[language].noCitations}</p>`
