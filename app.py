@@ -1,7 +1,7 @@
 import os
 import logging
 from dotenv import load_dotenv  # Load .env variables
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, redirect, url_for, session
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from rag_engine import analyze_statement
@@ -27,9 +27,16 @@ limiter = Limiter(
     storage_uri="memory://"
 )
 
+# Language Toggle Route
+@app.route('/set_language', methods=['POST'])
+def set_language():
+    session['language'] = request.form['language']
+    return redirect(request.referrer)
+
 @app.route('/')
 def index():
-    return render_template('index.html')
+    language = session.get('language', 'en')
+    return render_template('index.html', language=language)
 
 @app.route('/analyze', methods=['POST'])
 @limiter.limit("5 per minute")

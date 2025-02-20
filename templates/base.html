@@ -12,6 +12,12 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
             <a class="navbar-brand" href="/">Political Stance Analyzer</a>
+            <form method="POST" action="{{ url_for('set_language') }}" class="d-flex">
+                <select name="language" class="form-select" onchange="this.form.submit()">
+                    <option value="en" {% if session['language'] == 'en' %}selected{% endif %}>English</option>
+                    <option value="de" {% if session['language'] == 'de' %}selected{% endif %}>Deutsch</option>
+                </select>
+            </form>
         </div>
     </nav>
 

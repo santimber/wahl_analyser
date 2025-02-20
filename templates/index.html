@@ -5,15 +5,19 @@
     <div class="col-md-8">
         <div class="card">
             <div class="card-body">
-                <h2 class="card-title mb-4">Politische Aussagen Analysieren</h2>
+                <h2 class="card-title mb-4">
+                    {{ 'Politische Aussagen Analysieren' if language == 'de' else 'Analyze Political Statements' }}
+                </h2>
                 <form id="analysisForm">
                     <div class="mb-3">
-                        <label for="statement" class="form-label">Geben Sie eine politische Aussage ein:</label>
+                        <label for="statement" class="form-label">
+                            {{ 'Geben Sie eine politische Aussage ein:' if language == 'de' else 'Enter a political statement:' }}
+                        </label>
                         <textarea class="form-control" id="statement" rows="3" required></textarea>
                     </div>
                     <button type="submit" class="btn btn-primary" id="analyzeBtn">
                         <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
-                        Analysieren
+                        {{ 'Analysieren' if language == 'de' else 'Analyze' }}
                     </button>
                 </form>
             </div>
@@ -24,21 +28,6 @@
                 <div class="card-body">
                     <div id="explanations">
                         <!-- Analysis results will be inserted here -->
-                    </div>
-
-                    <div class="mt-4">
-                        <h4>Ergebnisse Teilen</h4>
-                        <div class="d-flex gap-2">
-                            <button class="btn btn-primary" onclick="shareTwitter()">
-                                <i class="fab fa-twitter"></i> Twitter
-                            </button>
-                            <button class="btn btn-primary" onclick="shareFacebook()">
-                                <i class="fab fa-facebook"></i> Facebook
-                            </button>
-                            <button class="btn btn-primary" onclick="shareLinkedIn()">
-                                <i class="fab fa-linkedin"></i> LinkedIn
-                            </button>
-                        </div>
                     </div>
                 </div>
             </div>
