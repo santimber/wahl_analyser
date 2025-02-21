@@ -6,13 +6,15 @@
         <div class="card">
             <div class="card-body">
                 <h2 class="card-title mb-4">
-                    {{ 'Politische Aussagen Analysieren' if language == 'de' else 'Analyze Political Statements' }}
+                    {{ 'Noch Unentschlossen  vor der Wahl?' if language == 'de' else 'Still Undecided Before the Vote?' }}
                 </h2>
                 <form id="analysisForm">
                     <div class="mb-3">
                         <label for="statement" class="form-label">
-                            {{ 'Geben Sie eine politische Aussage ein:' if language == 'de' else 'Enter a political statement:' }}
-                        </label>
+                            {% autoescape off %}
+                                {{ 'Nicht sicher, wen Sie am Sonntag, den 23., wählen sollen? Diese App hilft Ihnen zu entdecken, wie die wichtigsten Parteien zu den Themen stehen, die Ihnen wichtig sind basierend auf ihren Wahlprogrammen.<br><br>Hinweis: Keine Wahlempfehlung. Schauen Sie auf den Webseiten der Parteien vorbei und bleiben Sie mit Nachrichten auf dem Laufenden.<br><br>Äußern Sie Ihre Meinung zu einem politischen Thema:' if language == 'de' else 'Not sure who to vote for on Sunday, the 23rd? This app helps you discover how key parties stand on topics that matter to you, based on their political plans.<br><br>Note: This is not a voting recommendation. Learn more about party positions on their websites and in the news.<br><br>Express your view on a political topic:' }}
+                            {% endautoescape %}
+                            </label>
                         <textarea class="form-control" id="statement" rows="3" required></textarea>
                     </div>
                     <button type="submit" class="btn btn-primary" id="analyzeBtn">
