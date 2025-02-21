@@ -185,13 +185,13 @@ document.addEventListener('DOMContentLoaded', function () {
     // Added getPartyFullName function
     function getPartyFullName(partyKey) {
         const partyNames = {
-            'afd': language === 'de' ? 'Alternative für Deutschland' : 'Alternative for Germany',
-            'bsw': language === 'de' ? 'Bündnis Sahra Wagenknecht' : 'Alliance Sahra Wagenknecht',
-            'cdu_csu': 'CDU/CSU',
+            'afd': language === 'de' ? '(AFD) Alternative für Deutschland' : '(AFD) Alternative for Germany',
+            'bsw': language === 'de' ? '(BSW) Bündnis Sahra Wagenknecht' : '(BSW) Alliance Sahra Wagenknecht',
+            'cdu_csu': language === 'de' ? '(CDU/CSU) Christlich Demokratische Union': '(CDU/CSU) Christian Democratic Union',
             'linke': language === 'de' ? 'DIE LINKE' : 'The Left',
-            'fdp': language === 'de' ? 'Freie Demokratische Partei' : 'Free Democratic Party',
+            'fdp': language === 'de' ? '(FDP) Freie Demokratische Partei' : '(FDP) Free Democratic Party',
             'gruene': language === 'de' ? 'BÜNDNIS 90/DIE GRÜNEN' : 'Alliance 90/The Greens',
-            'spd': language === 'de' ? 'Sozialdemokratische Partei Deutschlands' : 'Social Democratic Party of Germany'
+            'spd': language === 'de' ? '(SPD) Sozialdemokratische Partei Deutschlands' : '(SPD) Social Democratic Party of Germany'
         };
         return partyNames[partyKey] || partyKey;
     }
