@@ -3,6 +3,8 @@ import logging
 from typing import List, Dict, Tuple
 import PyPDF2
 import re
+import nltk
+nltk.download('punkt', quiet=True)
 import fitz
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from dotenv import load_dotenv
@@ -69,14 +71,39 @@ def read_pdf(file_path: str) -> List[Tuple[int, str]]:
 
 def process_document(text: str) -> List[str]:
     """
-    Process a document by splitting it into chunks suitable for embedding.
+    Process a document by first splitting it into sentences (using NLTK) and
+    then chunking them for embedding.
     """
+    from nltk.tokenize import sent_tokenize
+
+    # 1. Sentence tokenize (assuming German documents)
+    sentences = sent_tokenize(text, language='german')
+
+    # 2. Optionally merge very short adjacent sentences
+    processed_sentences = []
+    buffer = ""
+    for s in sentences:
+        s = s.strip()
+        if not buffer:
+            buffer = s
+        elif len(buffer) + len(s) < 120:
+            buffer += " " + s
+        else:
+            processed_sentences.append(buffer.strip())
+            buffer = s
+    if buffer:
+        processed_sentences.append(buffer.strip())
+
+    # 3. Re-join them with newlines to preserve natural breaks
+    final_text = "\n".join(processed_sentences)
+
+    # 4. Use RecursiveCharacterTextSplitter for final chunking
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=1000,
         chunk_overlap=200,
         length_function=len,
     )
-    return text_splitter.split_text(text)
+    return text_splitter.split_text(final_text)
 
 
 def ingest_documents(documents: List[Dict[str, str]]):
@@ -135,38 +162,38 @@ if __name__ == "__main__":
     # Define the documents to process with official German party names
     documents = [
         {
-            "file_path": "/static/documents/AFD.pdf",
-            "party": "(AFD) Alternative für Deutschland",
+            "file_path": "./static/documents/AFD.pdf",
+            "party": "Alternative für Deutschland",
             "category": "platform"
         },
         {
-            "file_path": "/static/documents/BSW.pdf",
-            "party": "(BSW) Bündnis Sahra Wagenknecht",
+            "file_path": "./static/documents/BSW.pdf",
+            "party": "Bündnis Sahra Wagenknecht",
             "category": "platform"
         },
         {
-            "file_path": "/static/documents/CDU_CSU.pdf",
-            "party": "(CDU/CSU) Christlich Demokratische Union",
+            "file_path": "./static/documents/CDU_CSU.pdf",
+            "party": "Christlich Demokratische Union",
             "category": "platform"
         },
         {
-            "file_path": "/static/documents/Die Linke.pdf",
+            "file_path": "./static/documents/Die Linke.pdf",
             "party": "DIE LINKE",
             "category": "platform"
         },
         {
-            "file_path": "/static/documents/FDP.pdf",
-            "party": "(FDP) Freie Demokratische Partei",
+            "file_path": "./static/documents/FDP.pdf",
+            "party": "Freie Demokratische Partei",
             "category": "platform"
         },
         {
-            "file_path": "/static/documents/Gruen.pdf",
-            "party": "BÜNDNIS 90/DIE GRÜNEN",
+            "file_path": "./static/documents/Gruen.pdf",
+            "party": "BÜNDNIS 90_DIE GRÜNEN",
             "category": "platform"
         },
         {
-            "file_path": "/static/documents/SPD.pdf",
-            "party": "(SPD) Sozialdemokratische Partei Deutschlands",
+            "file_path": "./static/documents/SPD.pdf",
+            "party": "Sozialdemokratische Partei Deutschlands",
             "category": "platform"
         }
     ]

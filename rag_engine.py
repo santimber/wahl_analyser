@@ -23,10 +23,10 @@ def normalize_party_name(party: str) -> str:
     mapping = {
         "alternative_für_deutschland": "afd",
         "bündnis_sahra_wagenknecht": "bsw",
-        "cdu/csu": "cdu_csu",
+        "christlich_demokratische_union": "cdu_csu",
         "die_linke": "linke",
         "freie_demokratische_partei": "fdp",
-        "bündnis_90/die_grünen": "gruene",
+        "bündnis_90_die_grünen": "gruene",
         "sozialdemokratische_partei_deutschlands": "spd"
     }
     normalized = party.lower().replace(" ", "_").replace("/", "_")
