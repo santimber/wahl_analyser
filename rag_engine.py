@@ -33,7 +33,7 @@ def normalize_party_name(party: str) -> str:
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
-# ✅ Direct Links to Official Wahlprograms
+# Direct Links to Official Wahlprograms
 WAHLPROGRAM_URLS = {
     "cdu_csu": "https://www.cdu.de/app/uploads/2025/01/km_btw_2025_wahlprogramm_langfassung_ansicht.pdf",
     "spd": "https://www.spd.de/fileadmin/Dokumente/Beschluesse/Programm/SPD_Programm_bf.pdf",
@@ -44,7 +44,7 @@ WAHLPROGRAM_URLS = {
     "bsw": "https://bsw-vg.de/wp-content/themes/bsw/assets/downloads/BSW%20Wahlprogramm%202025.pdf"
 }
 
-# ✅ Embeddings and Vector Store Initialization
+# Embeddings and Vector Store Initialization
 try:
     logger.info("Initializing OpenAI embeddings")
     embeddings = OpenAIEmbeddings()
@@ -61,11 +61,11 @@ except Exception as e:
     )
     raise
 
-# ✅ Language Model Initialization
+# Language Model Initialization
 logger.info("Initializing ChatOpenAI")
 llm = ChatOpenAI(temperature=0, model="gpt-4")
 
-# ✅ Prompt Template
+# Prompt Template
 template = """
 First, detect the language of the user's query.
 - If the query is in English, respond in English.
@@ -110,7 +110,7 @@ PROMPT = PromptTemplate(
     input_variables=["context", "question"]
 )
 
-# ✅ QA Chain Initialization (Before analyze_statement)
+# QA Chain Initialization (Before analyze_statement)
 logger.info("Creating QA chain")
 qa_chain = RetrievalQA.from_chain_type(
     llm=llm,
