@@ -3,6 +3,7 @@ import logging
 from typing import List, Dict, Tuple
 import PyPDF2
 import re
+import fitz
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from dotenv import load_dotenv
 from langchain_openai import OpenAIEmbeddings
@@ -38,18 +39,28 @@ def clean_page_text(text: str) -> str:
 
 def read_pdf(file_path: str) -> List[Tuple[int, str]]:
     """
-    Read each page from a PDF file and return a list of (page_number, page_text) tuples.
-    This approach avoids embedding page markers in the text content itself.
-    Cleans each page to remove line numbers and other artifacts.
+    Read each page from a PDF file using PyMuPDF (fitz), extracting blocks in reading order.
+    Returns a list of (page_number, cleaned_text) tuples.
     """
     pages = []
     try:
-        with open(file_path, 'rb') as file:
-            pdf_reader = PyPDF2.PdfReader(file)
-            for page_num, page in enumerate(pdf_reader.pages, start=1):
-                raw_content = page.extract_text() or ''
+        with fitz.open(file_path) as doc:
+            for page_index in range(len(doc)):
+                page = doc[page_index]
+                # Extract blocks, each block is (x0, y0, x1, y1, text, block_type, block_no)
+                blocks = page.get_text("blocks") or []
+                # Sort blocks top-to-bottom, then left-to-right
+                blocks.sort(key=lambda b: (b[1], b[0]))
+
+                # Join block texts
+                joined_text = []
+                for b in blocks:
+                    # b[4] is the text portion of the block tuple
+                    joined_text.append(b[4])
+
+                raw_content = "".join(joined_text)
                 cleaned_content = clean_page_text(raw_content)
-                pages.append((page_num, cleaned_content))
+                pages.append((page_index + 1, cleaned_content))
     except Exception as e:
         logger.error(f"Error reading PDF file {file_path}: {str(e)}")
         raise
