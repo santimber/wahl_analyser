@@ -1,7 +1,8 @@
 import os
 import logging
-from typing import List, Dict
+from typing import List, Dict, Tuple
 import PyPDF2
+import re
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from dotenv import load_dotenv
 from langchain_openai import OpenAIEmbeddings
@@ -17,24 +18,45 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
-def read_pdf(file_path: str) -> str:
+def clean_page_text(text: str) -> str:
     """
-    Read text content from a PDF file.
+    Remove line numbers, page artifacts, and extra spacing from PDF text.
+    This is a simple approach; it may need further refinement for multi-column or footnotes.
     """
+    lines = text.splitlines()
+    cleaned_lines = []
+    for line in lines:
+        # Remove all digit sequences to handle line numbering or line references
+        line = re.sub(r'\d+', '', line)
+        # Strip leftover whitespace, unify spacing
+        line = line.strip()
+        line = re.sub(r'\s+', ' ', line)
+        if line:
+            cleaned_lines.append(line)
+    # Rejoin lines into a single string
+    return ' '.join(cleaned_lines)
+
+def read_pdf(file_path: str) -> List[Tuple[int, str]]:
+    """
+    Read each page from a PDF file and return a list of (page_number, page_text) tuples.
+    This approach avoids embedding page markers in the text content itself.
+    Cleans each page to remove line numbers and other artifacts.
+    """
+    pages = []
     try:
         with open(file_path, 'rb') as file:
             pdf_reader = PyPDF2.PdfReader(file)
-            text = ""
-            for page_num, page in enumerate(pdf_reader.pages, 1):
-                content = page.extract_text()
-                # Add page number metadata
-                text += f"[PAGE {page_num}] {content}"
-            return text
+            for page_num, page in enumerate(pdf_reader.pages, start=1):
+                raw_content = page.extract_text() or ''
+                cleaned_content = clean_page_text(raw_content)
+                pages.append((page_num, cleaned_content))
     except Exception as e:
         logger.error(f"Error reading PDF file {file_path}: {str(e)}")
         raise
 
-def process_document(text: str, metadata: Dict = None) -> List[str]:
+    return pages
+
+def process_document(text: str) -> List[str]:
     """
     Process a document by splitting it into chunks suitable for embedding.
     """
@@ -44,6 +66,7 @@ def process_document(text: str, metadata: Dict = None) -> List[str]:
         length_function=len,
     )
     return text_splitter.split_text(text)
+
 
 def ingest_documents(documents: List[Dict[str, str]]):
     """
@@ -61,36 +84,22 @@ def ingest_documents(documents: List[Dict[str, str]]):
         for doc in documents:
             logger.info(f"Processing document for {doc['party']}")
 
-            # Read PDF content
-            text = read_pdf(doc['file_path'])
-            chunks = process_document(text)
+            # Read pages from PDF
+            pdf_pages = read_pdf(doc['file_path'])
 
-            # Extract page numbers from the text and include in metadata
-            texts_with_metadata = []
-            for chunk in chunks:
-                page_num = None
-                # Look for page number in chunk
-                for line in chunk.split('\n'):
-                    if line.startswith('[PAGE ') and ']' in line:
-                        try:
-                            page_num = int(line[6:line.index(']')])
-                            chunk = chunk.replace(f"[PAGE {page_num}] ", "")
-                            break
-                        except ValueError:
-                            continue
+            # For each page, create chunks and store with metadata (including page number)
+            for page_num, page_content in pdf_pages:
+                # Split the page content into chunks
+                chunks = process_document(page_content)
 
-                texts_with_metadata.append({
-                    "text": chunk,
-                    "metadata": {
+                for chunk in chunks:
+                    all_texts.append(chunk)
+                    all_metadatas.append({
                         "party": doc["party"],
                         "category": doc.get("category", "platform"),
                         "source": os.path.basename(doc["file_path"]),
-                        "page": str(page_num) if page_num else None
-                    }
-                })
-
-            all_texts.extend([item["text"] for item in texts_with_metadata])
-            all_metadatas.extend([item["metadata"] for item in texts_with_metadata])
+                        "page": str(page_num)
+                    })
 
         # Create and save the FAISS index
         logger.info("Creating FAISS index")
@@ -110,22 +119,23 @@ def ingest_documents(documents: List[Dict[str, str]]):
         logger.error(f"Error ingesting documents: {str(e)}")
         raise
 
+
 if __name__ == "__main__":
     # Define the documents to process with official German party names
     documents = [
         {
             "file_path": "/static/documents/AFD.pdf",
-            "party": "Alternative für Deutschland",
+            "party": "(AFD) Alternative für Deutschland",
             "category": "platform"
         },
         {
             "file_path": "/static/documents/BSW.pdf",
-            "party": "Bündnis Sahra Wagenknecht",
+            "party": "(BSW) Bündnis Sahra Wagenknecht",
             "category": "platform"
         },
         {
             "file_path": "/static/documents/CDU_CSU.pdf",
-            "party": "CDU/CSU",
+            "party": "(CDU/CSU) Christlich Demokratische Union",
             "category": "platform"
         },
         {
@@ -135,7 +145,7 @@ if __name__ == "__main__":
         },
         {
             "file_path": "/static/documents/FDP.pdf",
-            "party": "Freie Demokratische Partei",
+            "party": "(FDP) Freie Demokratische Partei",
             "category": "platform"
         },
         {
@@ -145,7 +155,7 @@ if __name__ == "__main__":
         },
         {
             "file_path": "/static/documents/SPD.pdf",
-            "party": "Sozialdemokratische Partei Deutschlands",
+            "party": "(SPD) Sozialdemokratische Partei Deutschlands",
             "category": "platform"
         }
     ]
