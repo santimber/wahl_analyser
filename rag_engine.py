@@ -1,6 +1,9 @@
 import os
 import json
 import logging
+import nltk
+nltk.download('punkt')
+from nltk.tokenize import sent_tokenize
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_community.vectorstores import FAISS
 from dotenv import load_dotenv
@@ -115,7 +118,7 @@ logger.info("Creating QA chain")
 qa_chain = RetrievalQA.from_chain_type(
     llm=llm,
     chain_type="stuff",
-    retriever=vectorstore.as_retriever(search_kwargs={"k": 15}),
+    retriever=vectorstore.as_retriever(search_kwargs={"k": 20}),
     chain_type_kwargs={
         "prompt": PROMPT,
         "verbose": True
@@ -128,7 +131,7 @@ def extract_citations(source_docs):
     """
     Extract and format quotations with direct links to Wahlprograms.
     - Limits to a maximum of 3 citations per party.
-    - Ensures complete sentences.
+    - Returns the entire and most relevant chunks to provide more context.
     """
     citations_by_party = {
         party: [] for party in [
@@ -142,37 +145,28 @@ def extract_citations(source_docs):
                 doc.metadata.get("party", "")
             )
             if party_key in citations_by_party:
+
+                # The entire chunk as extracted from the doc
                 raw_text = doc.page_content.strip()
+                # Attempt to remove bracketed prefix if present
                 text_parts = raw_text.split(']')
-                extracted_text = (
-                    text_parts[-1] if len(text_parts) > 1 else raw_text
-                )
+                extracted_text = text_parts[-1] if len(text_parts) > 1 else raw_text
                 extracted_text = extracted_text.strip().replace("\n", " ")
 
-                sentences = extracted_text.split('. ')
-                citations = []
-
-                for sentence in sentences[:3]:  # Max 3 citations per party
-                    final_text = sentence.strip()
-
+                # Only add up to 3 citations per party
+                if len(citations_by_party[party_key]) < 3:
                     # Direct link to official Wahlprogram
                     wahlprogram_link = WAHLPROGRAM_URLS.get(
                         party_key, "#"
                     )
-
-                    # Get page number if available
                     page_number = doc.metadata.get("page", "Unbekannt")
 
-                    # Construct citation with link and page number
-                    citations.append({
-                        "text": final_text,
+                    citations_by_party[party_key].append({
+                        "text": extracted_text,
                         "source": "Wahlprogram",
                         "wahlprogram_link": wahlprogram_link,
                         "page": page_number
                     })
-
-                if citations:
-                    citations_by_party[party_key] = citations
 
     return citations_by_party
 
