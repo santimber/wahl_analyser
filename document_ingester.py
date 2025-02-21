@@ -99,7 +99,7 @@ def process_document(text: str) -> List[str]:
 
     # 4. Use RecursiveCharacterTextSplitter for final chunking
     text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=1000,
+        chunk_size=800,
         chunk_overlap=200,
         length_function=len,
     )

@@ -81,8 +81,9 @@ IMPORTANT:
 - If the query is in English, TRANSLATE the context to English before analysis.
 - If the query is in German, use the context as is without translation.
 
-You are an expert in political analysis. Analyze the following political 
-statement and provide the stance of each German political party.
+You are an expert in political analysis. While analyzing each party, provide a distinct stance and explanation. If multiple parties have similar stances, clarify how or why they might differ. Do not repeat the same explanation for different parties unless the context explicitly shows they have identical views.
+
+ALWAYS include at least one reference (citations array) if there is any relevant information in the context. If no reference is found, leave it as an empty array.
 
 Context: {context}
 
@@ -104,7 +105,7 @@ STRICT REQUIREMENTS:
 - No text or explanations outside the JSON object.
 - If the query is in English, explanations must be in English.
 - If the query is in German, explanations must be in German.
-- DO NOT provide any introductory or closing text.
+- Do NOT provide any introductory or closing text.
 - If unable to provide a valid JSON response, state "Invalid JSON Format".
 """
 
@@ -118,7 +119,7 @@ logger.info("Creating QA chain")
 qa_chain = RetrievalQA.from_chain_type(
     llm=llm,
     chain_type="stuff",
-    retriever=vectorstore.as_retriever(search_kwargs={"k": 20}),
+    retriever=vectorstore.as_retriever(search_kwargs={"k": 35}),
     chain_type_kwargs={
         "prompt": PROMPT,
         "verbose": True
