@@ -3,13 +3,24 @@ import logging
 from typing import List, Dict, Tuple
 import PyPDF2
 import re
-import nltk
-nltk.download('punkt', quiet=True)
+
 import fitz
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from dotenv import load_dotenv
 from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import FAISS
+
+import nltk
+# Specify the download directory
+nltk_data_dir = '/opt/render/nltk_data'
+os.makedirs(nltk_data_dir, exist_ok=True)
+
+# Set the NLTK data path
+nltk.data.path.append(nltk_data_dir)
+
+# Download the required resource
+nltk.download('punkt', download_dir=nltk_data_dir, quiet=True)
+
 
 # Load environment variables
 load_dotenv()
