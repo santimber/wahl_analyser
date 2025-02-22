@@ -10,23 +10,9 @@ from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import FAISS
 
 import nltk
+nltk.download('punkt', quiet=True)
 
-# Specify the download directory
-nltk_data_dir = '/opt/render/nltk_data'
-os.makedirs(nltk_data_dir, exist_ok=True)
 
-# Set the NLTK data path
-nltk.data.path.append(nltk_data_dir)
-
-# Download necessary NLTK data
-nltk.download('punkt', download_dir=nltk_data_dir, quiet=True)
-nltk.download('averaged_perceptron_tagger', download_dir=nltk_data_dir, quiet=True)
-nltk.download('universal_tagset', download_dir=nltk_data_dir, quiet=True)
-nltk.download('perluniprops', download_dir=nltk_data_dir, quiet=True)
-nltk.download('nonbreaking_prefixes', download_dir=nltk_data_dir, quiet=True)
-
-# Explicitly download the German models
-nltk.download('punkt', download_dir=nltk_data_dir)
 
 # Load environment variables
 load_dotenv()
