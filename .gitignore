@@ -36,7 +36,8 @@ ENV/
 # Project specific
 instance/
 *.db
-faiss_index/
+document_ingester.py
+
 
 # Logs
 *.log

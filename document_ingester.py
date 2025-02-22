@@ -151,9 +151,8 @@ def ingest_documents(documents: List[Dict[str, str]]):
         )
 
         # Save the index
-        index_path = '/mnt/data/faiss_index/index.faiss'
         logger.info("Saving FAISS index")
-        vectorstore.save_local(index_path)
+        vectorstore.save_local("faiss_index")
 
         logger.info("Document ingestion completed successfully")
 
