@@ -78,33 +78,29 @@ except Exception as e:
 
 # Language Model Initialization
 logger.info("Initializing ChatOpenAI")
-llm = ChatOpenAI(temperature=0, model="gpt-3.5-turbo")
+llm = ChatOpenAI(temperature=0, model="gpt-4")
 
 # Prompt Template
 template = """
 First, determine the language of the user's query:
-- If the query is in English, respond entirely in English.
-- If the query is in German, respond entirely in German.
-- Do not mix languages—every word in the JSON output must be in the same language as the query.
+- If the query is in English, respond in English.
+- If the query is in German, respond in German.
+- Do not switch languages. Use the same language for all parts of the JSON response.
 
 IMPORTANT:
 - The provided context is in German.
-- If the query is in English, internally translate the German context to English for analysis, but do not include the translated context in your output. Your final answer must be entirely in English.
-- If the query is in German, use the German context as is, without translation.
-- You must output the final answer exclusively as a valid JSON object with no additional text, commentary, or explanation.
+- If the query is in English, TRANSLATE the German context internally to English before analysis, but do not include the translated text in the final response.
+- If the query is in German, use the German context as is (no translation).
 
-You are an expert in political analysis. Analyze the context and the statement. For each political party, provide:
-- An "agreement" score (an integer between 0 and 100).
-- A clear and concise "explanation" in the same language as the query.
-- A "citations" array that includes at least one reference if relevant information exists in the context. If no reference applies, leave the array empty.
-- For each citation, include a JSON object with the keys: "text", "source", "wahlprogram_link", and "page".
+You are an expert in political analysis. While analyzing each party, provide a distinct stance and explanation. If multiple parties have similar stances, clarify how or why they might differ. Do not repeat the same explanation for different parties unless the context explicitly shows they have identical views.
+
+ALWAYS include at least one reference (citations array) if there is any relevant information in the context. If no reference is found, leave it as an empty array.
 
 Context: {context}
 
 Statement: {question}
 
-Reply ONLY with a JSON object following exactly this format (do not include any additional keys or text):
-
+Reply ONLY with a JSON object in this format:
 {{
   "afd": {{"agreement": 75, "explanation": "Explanation", "citations": []}},
   "bsw": {{"agreement": 50, "explanation": "Explanation", "citations": []}},
@@ -117,10 +113,11 @@ Reply ONLY with a JSON object following exactly this format (do not include any 
 
 STRICT REQUIREMENTS:
 - The response MUST be valid JSON.
-- Do NOT include any text or explanations outside of the JSON object.
-- If the user query is in English, every word (keys and values) must be in English.
-- If the user query is in German, every word (keys and values) must be in German.
-- If you are unable to provide a valid JSON response, output exactly: "Invalid JSON Format".
+- No text or explanations outside the JSON object.
+- If the users query is in English, all text in the JSON must be in English (explanations, references, etc.).
+- If the users query is in German, all text in the JSON must be in German.
+- Do NOT provide any introductory or closing text.
+- If unable to provide a valid JSON response, return "Invalid JSON Format.
 """
 
 PROMPT = PromptTemplate(
@@ -133,10 +130,10 @@ logger.info("Creating QA chain")
 qa_chain = RetrievalQA.from_chain_type(
     llm=llm,
     chain_type="stuff",
-    retriever=vectorstore.as_retriever(search_kwargs={"k": 40}),
+    retriever=vectorstore.as_retriever(search_kwargs={"k": 5}),
     chain_type_kwargs={
         "prompt": PROMPT,
-        "verbose": True
+        "verbose": False
     },
     return_source_documents=True
 )
