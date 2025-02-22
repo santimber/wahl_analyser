@@ -53,8 +53,9 @@ try:
     embeddings = OpenAIEmbeddings()
 
     logger.info("Loading FAISS index")
+    index_path = '/mnt/data/faiss_index/index.faiss' 
     vectorstore = FAISS.load_local(
-        "faiss_index",
+        index_path,
         embeddings,
         allow_dangerous_deserialization=True
     )
