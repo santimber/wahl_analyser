@@ -3,7 +3,6 @@ import logging
 from typing import List, Dict, Tuple
 import PyPDF2
 import re
-
 import fitz
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from dotenv import load_dotenv
@@ -19,11 +18,15 @@ os.makedirs(nltk_data_dir, exist_ok=True)
 # Set the NLTK data path
 nltk.data.path.append(nltk_data_dir)
 
-# Download the necessary NLTK data
+# Download necessary NLTK data
 nltk.download('punkt', download_dir=nltk_data_dir, quiet=True)
 nltk.download('averaged_perceptron_tagger', download_dir=nltk_data_dir, quiet=True)
 nltk.download('universal_tagset', download_dir=nltk_data_dir, quiet=True)
+nltk.download('perluniprops', download_dir=nltk_data_dir, quiet=True)
+nltk.download('nonbreaking_prefixes', download_dir=nltk_data_dir, quiet=True)
 
+# Explicitly download the German models
+nltk.download('punkt', download_dir=nltk_data_dir)
 
 # Load environment variables
 load_dotenv()
