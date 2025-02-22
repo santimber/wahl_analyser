@@ -112,12 +112,12 @@ Reply ONLY with a JSON object in this format:
 }}
 
 STRICT REQUIREMENTS:
-- The response MUST be in valid JSON format.
+- The response MUST be valid JSON.
 - No text or explanations outside the JSON object.
-- If the query is in English, explanations must be in English.
-- If the query is in German, explanations must be in German.
+- If the user’s query is in English, all text in the JSON must be in English (explanations, references, etc.).
+- If the user’s query is in German, all text in the JSON must be in German.
 - Do NOT provide any introductory or closing text.
-- If unable to provide a valid JSON response, state "Invalid JSON Format".
+- If unable to provide a valid JSON response, return "Invalid JSON Format".
 """
 
 PROMPT = PromptTemplate(
