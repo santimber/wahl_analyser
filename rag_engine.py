@@ -78,7 +78,7 @@ except Exception as e:
 
 # Language Model Initialization
 logger.info("Initializing ChatOpenAI")
-llm = ChatOpenAI(temperature=0, model="gpt-4")
+llm = ChatOpenAI(temperature=0, model="gpt-3.5-turbo")
 
 # Prompt Template
 template = """
@@ -131,7 +131,7 @@ logger.info("Creating QA chain")
 qa_chain = RetrievalQA.from_chain_type(
     llm=llm,
     chain_type="stuff",
-    retriever=vectorstore.as_retriever(search_kwargs={"k": 8}),
+    retriever=vectorstore.as_retriever(search_kwargs={"k": 5}),
     chain_type_kwargs={
         "prompt": PROMPT,
         "verbose": True
