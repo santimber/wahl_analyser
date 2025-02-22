@@ -133,7 +133,7 @@ logger.info("Creating QA chain")
 qa_chain = RetrievalQA.from_chain_type(
     llm=llm,
     chain_type="stuff",
-    retriever=vectorstore.as_retriever(search_kwargs={"k": 6}),
+    retriever=vectorstore.as_retriever(search_kwargs={"k": 12}),
     chain_type_kwargs={
         "prompt": PROMPT,
         "verbose": True
