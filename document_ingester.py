@@ -11,6 +11,7 @@ from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import FAISS
 
 import nltk
+
 # Specify the download directory
 nltk_data_dir = '/opt/render/nltk_data'
 os.makedirs(nltk_data_dir, exist_ok=True)
@@ -18,8 +19,10 @@ os.makedirs(nltk_data_dir, exist_ok=True)
 # Set the NLTK data path
 nltk.data.path.append(nltk_data_dir)
 
-# Download the required resource
+# Download the necessary NLTK data
 nltk.download('punkt', download_dir=nltk_data_dir, quiet=True)
+nltk.download('averaged_perceptron_tagger', download_dir=nltk_data_dir, quiet=True)
+nltk.download('universal_tagset', download_dir=nltk_data_dir, quiet=True)
 
 
 # Load environment variables
