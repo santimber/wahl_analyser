@@ -78,7 +78,7 @@ except Exception as e:
 
 # Language Model Initialization
 logger.info("Initializing ChatOpenAI")
-llm = ChatOpenAI(temperature=0, model="gpt-3.5-turbo")
+llm = ChatOpenAI(temperature=0, model="gpt-4")
 
 # Prompt Template
 template = """
@@ -114,8 +114,8 @@ Reply ONLY with a JSON object in this format:
 STRICT REQUIREMENTS:
 - The response MUST be valid JSON.
 - No text or explanations outside the JSON object.
-- If the user’s query is in English, all text in the JSON must be in English (explanations, references, etc.).
-- If the user’s query is in German, all text in the JSON must be in German.
+- If the users query is in English, all text in the JSON must be in English (explanations, references, etc.).
+- If the users query is in German, all text in the JSON must be in German.
 - Do NOT provide any introductory or closing text.
 - If unable to provide a valid JSON response, return "Invalid JSON Format.
 """
@@ -130,7 +130,7 @@ logger.info("Creating QA chain")
 qa_chain = RetrievalQA.from_chain_type(
     llm=llm,
     chain_type="stuff",
-    retriever=vectorstore.as_retriever(search_kwargs={"k": 5}),
+    retriever=vectorstore.as_retriever(search_kwargs={"k": 3}),
     chain_type_kwargs={
         "prompt": PROMPT,
         "verbose": True
