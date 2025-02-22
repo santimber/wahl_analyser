@@ -105,15 +105,15 @@ Statement: {question}
 
 Reply ONLY with a JSON object following exactly this format (do not include any additional keys or text):
 
-{
-  "afd": {"agreement": 75, "explanation": "Explanation", "citations": []},
-  "bsw": {"agreement": 50, "explanation": "Explanation", "citations": []},
-  "cdu_csu": {"agreement": 30, "explanation": "Explanation", "citations": []},
-  "linke": {"agreement": 20, "explanation": "Explanation", "citations": []},
-  "fdp": {"agreement": 60, "explanation": "Explanation", "citations": []},
-  "gruene": {"agreement": 40, "explanation": "Explanation", "citations": []},
-  "spd": {"agreement": 80, "explanation": "Explanation", "citations": []}
-}
+{{
+  "afd": {{"agreement": 75, "explanation": "Explanation", "citations": []}},
+  "bsw": {{"agreement": 50, "explanation": "Explanation", "citations": []}},
+  "cdu_csu": {{"agreement": 30, "explanation": "Explanation", "citations": []}},
+  "linke": {{"agreement": 20, "explanation": "Explanation", "citations": []}},
+  "fdp": {{"agreement": 60, "explanation": "Explanation", "citations": []}},
+  "gruene": {{"agreement": 40, "explanation": "Explanation", "citations": []}},
+  "spd": {{"agreement": 80, "explanation": "Explanation", "citations": []}}
+}}
 
 STRICT REQUIREMENTS:
 - The response MUST be valid JSON.
