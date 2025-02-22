@@ -10,7 +10,8 @@ langchain-openai
 langchain-community
 faiss-cpu
 openai
-nltk
+nltk==3.8.1
+
 
 # PDF Processing
 PyPDF2
