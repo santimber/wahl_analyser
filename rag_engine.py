@@ -2,13 +2,22 @@ import os
 import json
 import logging
 import nltk
-nltk.download('punkt')
+from nltk.data import find
+
+# Check if 'punkt' tokenizer is available, otherwise download it
+try:
+    find('tokenizers/punkt')
+except LookupError:
+    nltk.download('punkt') 
 from nltk.tokenize import sent_tokenize
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_community.vectorstores import FAISS
 from dotenv import load_dotenv
 from langchain.prompts import PromptTemplate
 from langchain.chains import RetrievalQA
+
+nltk_data_dir = '/mnt/data/nltk_data'
+nltk.data.path.append(nltk_data_dir)
 
 # Load environment variables
 load_dotenv()
@@ -119,7 +128,7 @@ logger.info("Creating QA chain")
 qa_chain = RetrievalQA.from_chain_type(
     llm=llm,
     chain_type="stuff",
-    retriever=vectorstore.as_retriever(search_kwargs={"k": 35}),
+    retriever=vectorstore.as_retriever(search_kwargs={"k": 25}),
     chain_type_kwargs={
         "prompt": PROMPT,
         "verbose": True
