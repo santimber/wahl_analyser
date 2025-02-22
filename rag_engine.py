@@ -117,7 +117,7 @@ STRICT REQUIREMENTS:
 - If the user’s query is in English, all text in the JSON must be in English (explanations, references, etc.).
 - If the user’s query is in German, all text in the JSON must be in German.
 - Do NOT provide any introductory or closing text.
-- If unable to provide a valid JSON response, return "Invalid JSON Format".
+- If unable to provide a valid JSON response, return "Invalid JSON Format.
 """
 
 PROMPT = PromptTemplate(
