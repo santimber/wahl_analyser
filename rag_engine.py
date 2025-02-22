@@ -82,16 +82,15 @@ llm = ChatOpenAI(temperature=0, model="gpt-3.5-turbo")
 
 # Prompt Template
 template = """
-First, detect the language of the user's query.
+First, determine the language of the user's query:
 - If the query is in English, respond in English.
 - If the query is in German, respond in German.
-- Do not switch languages.
-- Use the same language consistently for all parts of the JSON response.
+- Do not switch languages. Use the same language for all parts of the JSON response.
 
 IMPORTANT:
-- The context is in German.
-- If the query is in English, TRANSLATE the context to English before analysis.
-- If the query is in German, use the context as is without translation.
+- The provided context is in German.
+- If the query is in English, TRANSLATE the German context internally to English before analysis, but do not include the translated text in the final response.
+- If the query is in German, use the German context as is (no translation).
 
 You are an expert in political analysis. While analyzing each party, provide a distinct stance and explanation. If multiple parties have similar stances, clarify how or why they might differ. Do not repeat the same explanation for different parties unless the context explicitly shows they have identical views.
 
