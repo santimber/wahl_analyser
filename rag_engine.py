@@ -118,6 +118,7 @@ STRICT REQUIREMENTS:
 - If the users query is in English, all text in the JSON must be in English (explanations, references, etc.).
 - If the users query is in German, all text in the JSON must be in German.
 - Do NOT provide any introductory or closing text.
+- ALWAYS include at least one "citations" array that contains at least one citation. Each citation must be a chunk of text taken from the context that was used in your analysis.
 - If unable to provide a valid JSON response, return "Invalid JSON Format".
 """
 
