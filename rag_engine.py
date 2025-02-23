@@ -89,12 +89,12 @@ First, determine the language of the user's query:
 
 IMPORTANT:
 - The provided context is in German.
-- If the query is in English, TRANSLATE the German context internally to English before analysis, but do not include the translated text in the final response.
+- If the query is in English, internally translate the German context to English before analysis, but do not include the translated context in your output. Your final answer must be entirely in English.
 - If the query is in German, use the German context as is (no translation).
 
 You are an expert in political analysis. While analyzing each party, provide a distinct stance and explanation. If multiple parties have similar stances, clarify how or why they might differ. Do not repeat the same explanation for different parties unless the context explicitly shows they have identical views.
 
-ALWAYS include at least one reference (citations array) if there is any relevant information in the context.
+ALWAYS include at least one reference (citations array).
 
 Context: {context}
 
