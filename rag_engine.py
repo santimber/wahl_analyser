@@ -45,7 +45,7 @@ def normalize_party_name(party: str) -> str:
     return mapping.get(normalized, normalized)
 
 # Configure logging
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Direct Links to Official Wahlprograms
@@ -190,7 +190,7 @@ def analyze_statement(statement: str) -> dict:
         logger.info(f"Starting analysis of statement: {statement}")
 
         result = qa_chain({"query": statement})
-        logger.debug(f"Raw chain result: {result}")
+        #logger.debug(f"Raw chain result: {result}")
 
         source_docs = result.get("source_documents", [])
         citations_by_party = extract_citations(source_docs)
