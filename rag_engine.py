@@ -94,7 +94,7 @@ IMPORTANT:
 
 You are an expert in political analysis. While analyzing each party, provide a distinct stance and explanation. If multiple parties have similar stances, clarify how or why they might differ. Do not repeat the same explanation for different parties unless the context explicitly shows they have identical views.
 
-ALWAYS include at least one reference (citations array) if there is any relevant information in the context. If no reference is found, leave it as an empty array.
+ALWAYS include at least one reference (citations array) if there is any relevant information in the context.
 
 Context: {context}
 
@@ -130,7 +130,7 @@ logger.info("Creating QA chain")
 qa_chain = RetrievalQA.from_chain_type(
     llm=llm,
     chain_type="stuff",
-    retriever=vectorstore.as_retriever(search_kwargs={"k": 15}),
+    retriever=vectorstore.as_retriever(search_kwargs={"k": 10}),
     chain_type_kwargs={
         "prompt": PROMPT,
         "verbose": False
