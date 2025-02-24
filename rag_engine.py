@@ -89,7 +89,6 @@ First, determine the language of the user's query:
 
 IMPORTANT:
 - The provided context is in German.
-- If the query is in English, internally translate the German context to English before analysis, but do not include the translated context in your output. Your final answer must be entirely in English.
 - If the query is in German, use the German context as is (no translation).
 - You must include at least one citation per party. The citation(s) must be a chunk of text from the provided context that you used to support your analysis.
 
@@ -132,7 +131,7 @@ logger.info("Creating QA chain")
 qa_chain = RetrievalQA.from_chain_type(
     llm=llm,
     chain_type="stuff",
-    retriever=vectorstore.as_retriever(search_kwargs={"k": 25}),
+    retriever=vectorstore.as_retriever(search_kwargs={"k": 35}),
     chain_type_kwargs={
         "prompt": PROMPT,
         "verbose": False
