@@ -83,7 +83,7 @@ llm = ChatOpenAI(temperature=0, model="gpt-4")
 # Prompt Template
 template = """
 First, determine the language of the user's query:
-- If the query is in German, respond in German.
+- If the query is in German, respond in German. Antworte auf Deutsch, wenn jemand auf Deutsch schreibt.
 - If the query is in English, respond in English.
 - Do not switch languages. Use the same language for all parts of the JSON response.
 
