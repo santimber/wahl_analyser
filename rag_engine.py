@@ -83,8 +83,8 @@ llm = ChatOpenAI(temperature=0, model="gpt-4")
 # Prompt Template
 template = """
 First, determine the language of the user's query:
-- If the query is in English, respond in English.
 - If the query is in German, respond in German.
+- If the query is in English, respond in English.
 - Do not switch languages. Use the same language for all parts of the JSON response.
 
 IMPORTANT:
@@ -115,8 +115,8 @@ Reply ONLY with a JSON object in this format:
 STRICT REQUIREMENTS:
 - The response MUST be valid JSON.
 - No text or explanations outside the JSON object.
+- If the users query is in German, all text in the JSON must be in German. (explanations, references, etc.).
 - If the users query is in English, all text in the JSON must be in English (explanations, references, etc.).
-- If the users query is in German, all text in the JSON must be in German.
 - Do NOT provide any introductory or closing text.
 - ALWAYS include at least one "citations" array that contains at least one citation. Each citation must be a chunk of text taken from the context that was used in your analysis.
 - If unable to provide a valid JSON response, return "Invalid JSON Format".
