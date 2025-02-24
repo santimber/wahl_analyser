@@ -36,7 +36,6 @@ ENV/
 # Project specific
 instance/
 *.db
-pyproject.toml
 
 # Logs
 *.log
