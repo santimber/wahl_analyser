@@ -36,7 +36,6 @@ ENV/
 # Project specific
 instance/
 *.db
-document_ingester.py
 
 
 # Logs
