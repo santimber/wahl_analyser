@@ -36,6 +36,7 @@ ENV/
 # Project specific
 instance/
 *.db
+faiss_index
 
 # Logs
 *.log
